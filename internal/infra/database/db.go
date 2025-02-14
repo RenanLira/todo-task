@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+	"os"
 	"todo-tasks/internal/domain/todos"
 
 	"gorm.io/driver/postgres"
@@ -11,19 +13,30 @@ type Repository[T any] interface {
 	Create(entity *T) error
 	Update(entity *T) error
 	Delete(entity *T) error
-	Find(id uint) (*T, error)
+	Find(id string) (*T, error)
 }
 
-const dsn = "host=localhost user=postgres password=postgres dbname=tododb port=5432 sslmode=disable TimeZone=America/Sao_Paulo"
-
-func NewDB() (*gorm.DB, error) {
-	
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})	
-	if err != nil {
-		return nil, err
+func NewDB() *gorm.DB {
+	var info = map[string]string{
+		"host":     os.Getenv("DB_HOST"),
+		"port":     os.Getenv("DB_PORT"),
+		"user":     os.Getenv("DB_USERNAME"),
+		"password": os.Getenv("DB_PASSWORD"),
+		"dbname":   os.Getenv("DB_DATABASE"),
+		"sslmode":  "disable",
 	}
-	
+
+	var dsn string
+	for key, value := range info {
+		dsn += fmt.Sprintf("%s=%s ", key, value)
+	}
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+
 	db.AutoMigrate(&todos.Todo{})
-	
-	return db, nil
+
+	return db
 }

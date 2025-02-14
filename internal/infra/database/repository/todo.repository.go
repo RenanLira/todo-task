@@ -41,9 +41,5 @@ func (r *TodoRepositoryImp) GetAllTodos() ([]*todos.Todo, error) {
 }
 
 func NewTodoRepository() *TodoRepositoryImp {
-	db, err := database.NewDB()
-	if err != nil {
-		panic(err)
-	}
-	return &TodoRepositoryImp{db: db}
+	return &TodoRepositoryImp{db: database.NewDB()}
 }
