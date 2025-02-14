@@ -28,7 +28,7 @@ func (r *TodoRepositoryImp) Delete(todo *todos.Todo) error {
 	return r.db.Delete(todo).Error
 }
 
-func (r *TodoRepositoryImp) Find(id uint) (*todos.Todo, error) {
+func (r *TodoRepositoryImp) Find(id string) (*todos.Todo, error) {
 	var todo todos.Todo
 	err := r.db.First(&todo, id).Error
 	return &todo, err

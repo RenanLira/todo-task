@@ -10,7 +10,6 @@ import (
 type UserRepository interface {
 	database.Repository[users.User]
 	FindByEmail(email string) (*users.User, error)
-	FindByID(id string) (*users.User, error)
 }
 
 type UserRepositoryImpl struct {
