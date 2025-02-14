@@ -1,0 +1,11 @@
+input PageInput {
+  limit: Int = 10
+  offset: Int = 0
+  search: String
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  quantity: Int!
+}
