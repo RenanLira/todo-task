@@ -10,6 +10,7 @@ import (
 	"todo-tasks/graph/generated"
 	"todo-tasks/graph/model"
 	"todo-tasks/internal/domain/todos"
+	"todo-tasks/internal/utils"
 )
 
 // CreateTodo is the resolver for the createTodo field.
@@ -35,17 +36,24 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (*todos.To
 }
 
 // Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context, page model.PageInput) ([]*todos.Todo, error) {
-	todos, err := r.TodoService.GetAllTodos(todos.ReqGetAllTodosDTO{
-		Limit: page.Limit,
-		Offset: page.Offset,
-		Search: page.Search,
-	})
+func (r *queryResolver) Todos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error) {
+
+	var dto todos.ReqGetAllTodosDTO
+	utils.CopyStruct(&dto, *page)
+
+	todos, err := r.TodoService.GetAllTodos(dto)
 	if err != nil {
 		return nil, err
 	}
 
-	return todos, nil
+	return &model.TodosResponse{
+		Todos: todos.Todos,
+		PageInfo: &model.PageInfo{
+			HasNextPage:     todos.Page.HasNextPage,
+			HasPreviousPage: todos.Page.HasPreviousPage,
+			Quantity:        int32(todos.Page.Quantity),
+		},
+	}, nil
 }
 
 // TodoByID is the resolver for the todoById field.

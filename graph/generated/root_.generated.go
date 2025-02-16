@@ -56,13 +56,18 @@ type ComplexityRoot struct {
 
 	Query struct {
 		TodoByID func(childComplexity int, id string) int
-		Todos    func(childComplexity int, page model.PageInput) int
+		Todos    func(childComplexity int, page *model.PageInput) int
 	}
 
 	Todo struct {
 		Done func(childComplexity int) int
 		ID   func(childComplexity int) int
 		Text func(childComplexity int) int
+	}
+
+	TodosResponse struct {
+		PageInfo func(childComplexity int) int
+		Todos    func(childComplexity int) int
 	}
 
 	User struct {
@@ -170,7 +175,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Todos(childComplexity, args["page"].(model.PageInput)), true
+		return e.complexity.Query.Todos(childComplexity, args["page"].(*model.PageInput)), true
 
 	case "Todo.done":
 		if e.complexity.Todo.Done == nil {
@@ -192,6 +197,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Todo.Text(childComplexity), true
+
+	case "TodosResponse.pageInfo":
+		if e.complexity.TodosResponse.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.TodosResponse.PageInfo(childComplexity), true
+
+	case "TodosResponse.todos":
+		if e.complexity.TodosResponse.Todos == nil {
+			break
+		}
+
+		return e.complexity.TodosResponse.Todos(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -322,8 +341,8 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "../schemas/page.graphqls", Input: `input PageInput {
-  limit: Int = 10
-  offset: Int = 0
+  limit: Int
+  page: Int
   search: String
 }
 
@@ -343,8 +362,13 @@ input TodoInput {
   text: String!
 }
 
+type TodosResponse {
+  todos: [Todo!]!
+  pageInfo: PageInfo
+}
+
 type Query {
-  todos(page: PageInput!): [Todo!]!
+  todos(page: PageInput): TodosResponse!
   todoById(id: ID!): Todo
 }
 

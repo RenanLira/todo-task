@@ -170,14 +170,7 @@ func (ec *executionContext) unmarshalInputPageInput(ctx context.Context, obj any
 		asMap[k] = v
 	}
 
-	if _, present := asMap["limit"]; !present {
-		asMap["limit"] = 10
-	}
-	if _, present := asMap["offset"]; !present {
-		asMap["offset"] = 0
-	}
-
-	fieldsInOrder := [...]string{"limit", "offset", "search"}
+	fieldsInOrder := [...]string{"limit", "page", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -191,13 +184,13 @@ func (ec *executionContext) unmarshalInputPageInput(ctx context.Context, obj any
 				return it, err
 			}
 			it.Limit = data
-		case "offset":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		case "page":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
 			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Offset = data
+			it.Page = data
 		case "search":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -272,9 +265,19 @@ func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet,
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNPageInput2todoᚑtasksᚋgraphᚋmodelᚐPageInput(ctx context.Context, v any) (model.PageInput, error) {
+func (ec *executionContext) marshalOPageInfo2ᚖtodoᚑtasksᚋgraphᚋmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *model.PageInfo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PageInfo(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOPageInput2ᚖtodoᚑtasksᚋgraphᚋmodelᚐPageInput(ctx context.Context, v any) (*model.PageInput, error) {
+	if v == nil {
+		return nil, nil
+	}
 	res, err := ec.unmarshalInputPageInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 // endregion ***************************** type.gotpl *****************************

@@ -25,7 +25,7 @@ type MutationResolver interface {
 	DeleteTodo(ctx context.Context, id string) (*todos.Todo, error)
 }
 type QueryResolver interface {
-	Todos(ctx context.Context, page model.PageInput) ([]*todos.Todo, error)
+	Todos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error)
 	TodoByID(ctx context.Context, id string) (*todos.Todo, error)
 }
 
@@ -179,13 +179,13 @@ func (ec *executionContext) field_Query_todos_args(ctx context.Context, rawArgs 
 func (ec *executionContext) field_Query_todos_argsPage(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.PageInput, error) {
+) (*model.PageInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
 	if tmp, ok := rawArgs["page"]; ok {
-		return ec.unmarshalNPageInput2todoᚑtasksᚋgraphᚋmodelᚐPageInput(ctx, tmp)
+		return ec.unmarshalOPageInput2ᚖtodoᚑtasksᚋgraphᚋmodelᚐPageInput(ctx, tmp)
 	}
 
-	var zeroVal model.PageInput
+	var zeroVal *model.PageInput
 	return zeroVal, nil
 }
 
@@ -400,7 +400,7 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Todos(rctx, fc.Args["page"].(model.PageInput))
+		return ec.resolvers.Query().Todos(rctx, fc.Args["page"].(*model.PageInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -412,9 +412,9 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*todos.Todo)
+	res := resTmp.(*model.TodosResponse)
 	fc.Result = res
-	return ec.marshalNTodo2ᚕᚖtodoᚑtasksᚋinternalᚋdomainᚋtodosᚐTodoᚄ(ctx, field.Selections, res)
+	return ec.marshalNTodosResponse2ᚖtodoᚑtasksᚋgraphᚋmodelᚐTodosResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_todos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -425,14 +425,12 @@ func (ec *executionContext) fieldContext_Query_todos(ctx context.Context, field 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Todo_id(ctx, field)
-			case "text":
-				return ec.fieldContext_Todo_text(ctx, field)
-			case "done":
-				return ec.fieldContext_Todo_done(ctx, field)
+			case "todos":
+				return ec.fieldContext_TodosResponse_todos(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_TodosResponse_pageInfo(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TodosResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -772,6 +770,107 @@ func (ec *executionContext) fieldContext_Todo_done(_ context.Context, field grap
 	return fc, nil
 }
 
+func (ec *executionContext) _TodosResponse_todos(ctx context.Context, field graphql.CollectedField, obj *model.TodosResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TodosResponse_todos(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Todos, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*todos.Todo)
+	fc.Result = res
+	return ec.marshalNTodo2ᚕᚖtodoᚑtasksᚋinternalᚋdomainᚋtodosᚐTodoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TodosResponse_todos(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TodosResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Todo_id(ctx, field)
+			case "text":
+				return ec.fieldContext_Todo_text(ctx, field)
+			case "done":
+				return ec.fieldContext_Todo_done(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TodosResponse_pageInfo(ctx context.Context, field graphql.CollectedField, obj *model.TodosResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TodosResponse_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.PageInfo)
+	fc.Result = res
+	return ec.marshalOPageInfo2ᚖtodoᚑtasksᚋgraphᚋmodelᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TodosResponse_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TodosResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "quantity":
+				return ec.fieldContext_PageInfo_quantity(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
@@ -1014,6 +1113,47 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var todosResponseImplementors = []string{"TodosResponse"}
+
+func (ec *executionContext) _TodosResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TodosResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, todosResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TodosResponse")
+		case "todos":
+			out.Values[i] = ec._TodosResponse_todos(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._TodosResponse_pageInfo(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
@@ -1079,6 +1219,20 @@ func (ec *executionContext) marshalNTodo2ᚖtodoᚑtasksᚋinternalᚋdomainᚋt
 func (ec *executionContext) unmarshalNTodoInput2todoᚑtasksᚋgraphᚋmodelᚐTodoInput(ctx context.Context, v any) (model.TodoInput, error) {
 	res, err := ec.unmarshalInputTodoInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTodosResponse2todoᚑtasksᚋgraphᚋmodelᚐTodosResponse(ctx context.Context, sel ast.SelectionSet, v model.TodosResponse) graphql.Marshaler {
+	return ec._TodosResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTodosResponse2ᚖtodoᚑtasksᚋgraphᚋmodelᚐTodosResponse(ctx context.Context, sel ast.SelectionSet, v *model.TodosResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TodosResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOTodo2ᚖtodoᚑtasksᚋinternalᚋdomainᚋtodosᚐTodo(ctx context.Context, sel ast.SelectionSet, v *todos.Todo) graphql.Marshaler {

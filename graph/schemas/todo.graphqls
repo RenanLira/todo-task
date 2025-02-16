@@ -8,8 +8,13 @@ input TodoInput {
   text: String!
 }
 
+type TodosResponse {
+  todos: [Todo!]!
+  pageInfo: PageInfo
+}
+
 type Query {
-  todos(page: PageInput!): [Todo!]!
+  todos(page: PageInput): TodosResponse!
   todoById(id: ID!): Todo
 }
 

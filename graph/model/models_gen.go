@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"todo-tasks/internal/domain/todos"
+)
+
 type Mutation struct {
 }
 
@@ -13,7 +17,7 @@ type PageInfo struct {
 
 type PageInput struct {
 	Limit  *int32  `json:"limit,omitempty"`
-	Offset *int32  `json:"offset,omitempty"`
+	Page   *int32  `json:"page,omitempty"`
 	Search *string `json:"search,omitempty"`
 }
 
@@ -22,4 +26,9 @@ type Query struct {
 
 type TodoInput struct {
 	Text string `json:"text"`
+}
+
+type TodosResponse struct {
+	Todos    []*todos.Todo `json:"todos"`
+	PageInfo *PageInfo     `json:"pageInfo,omitempty"`
 }

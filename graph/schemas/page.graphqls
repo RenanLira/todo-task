@@ -1,6 +1,6 @@
 input PageInput {
-  limit: Int = 10
-  offset: Int = 0
+  limit: Int
+  page: Int
   search: String
 }
 

@@ -5,7 +5,8 @@ type CreateTodoDTO struct {
 }
 
 type ReqGetAllTodosDTO struct {
-	Limit  *int32 `json:"limit"`
-	Offset *int32 `json:"offset"`
-	Search *string `json:"search"`
+	Limit  int32  `json:"limit"`
+	Page   int32  `json:"offset"`
+	Search string `json:"search"`
 }
+
