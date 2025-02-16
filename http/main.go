@@ -56,7 +56,6 @@ func main() {
 
 		r.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 		r.Handle("/", graphQLHandler())
-
 	})
 
 	server := &http.Server{
