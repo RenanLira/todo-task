@@ -4,3 +4,7 @@ type User {
     email: String!
 }
 
+
+extend type Mutation {
+    createUser(username: String!, email: String!): User!
+}

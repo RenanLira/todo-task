@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"todo-tasks/internal/domain/todos"
+	"todo-tasks/internal/domain/users"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -36,7 +37,7 @@ func NewDB() *gorm.DB {
 		panic(err)
 	}
 
-	db.AutoMigrate(&todos.Todo{})
+	db.AutoMigrate(&todos.Todo{}, &users.User{})
 
 	return db
 }

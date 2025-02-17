@@ -11,6 +11,16 @@ import (
 	"todo-tasks/internal/domain/users"
 )
 
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, username string, email string) (*users.User, error) {
+	user, err := r.UserResolver.CreateUser(username, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 // Name is the resolver for the name field.
 func (r *userResolver) Name(ctx context.Context, obj *users.User) (string, error) {
 	panic(fmt.Errorf("not implemented: Name - name"))

@@ -15,8 +15,16 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.TodoInput) (*todos.Todo, error) {
+
+
+	userID := ctx.Value("user_id")
+	if userID == nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
 	todo, err := r.TodoService.CreateTodo(todos.CreateTodoDTO{
-		Text: input.Text,
+		Text:   input.Text,
+		UserID: userID.(string),
 	})
 	if err != nil {
 		return nil, err
@@ -37,7 +45,6 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (*todos.To
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error) {
-
 	var dto todos.ReqGetAllTodosDTO
 	utils.CopyStruct(&dto, *page)
 

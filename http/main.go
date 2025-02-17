@@ -5,7 +5,8 @@ import (
 	"todo-tasks/graph"
 
 	"todo-tasks/graph/generated"
-	"todo-tasks/internal/domain/todos/services"
+	todo_service "todo-tasks/internal/domain/todos/services"
+	user_service "todo-tasks/internal/domain/users/services"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -26,7 +27,8 @@ func init() {
 
 func graphQLHandler() http.Handler {
 	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
-		TodoService: services.NewTodoService(),
+		TodoService:  todo_service.NewTodoService(),
+		UserResolver: user_service.NewUserService(),
 	}}))
 
 	srv.AddTransport(transport.Options{})
