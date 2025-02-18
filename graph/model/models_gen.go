@@ -32,3 +32,8 @@ type TodosResponse struct {
 	Todos    []*todos.Todo `json:"todos"`
 	PageInfo *PageInfo     `json:"pageInfo,omitempty"`
 }
+
+type UpdateTodo struct {
+	Text *string `json:"text,omitempty"`
+	Done *bool   `json:"done,omitempty"`
+}

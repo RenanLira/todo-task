@@ -22,7 +22,7 @@ import (
 
 type MutationResolver interface {
 	CreateTodo(ctx context.Context, input model.TodoInput) (*todos.Todo, error)
-	UpdateTodo(ctx context.Context, id string, input model.TodoInput) (*todos.Todo, error)
+	UpdateTodo(ctx context.Context, id string, update model.UpdateTodo) (*todos.Todo, error)
 	DeleteTodo(ctx context.Context, id string) (*todos.Todo, error)
 	CreateUser(ctx context.Context, username string, email string, password string) (*users.User, error)
 	LoginUser(ctx context.Context, email string, password string) (string, error)
@@ -190,11 +190,11 @@ func (ec *executionContext) field_Mutation_updateTodo_args(ctx context.Context, 
 		return nil, err
 	}
 	args["id"] = arg0
-	arg1, err := ec.field_Mutation_updateTodo_argsInput(ctx, rawArgs)
+	arg1, err := ec.field_Mutation_updateTodo_argsUpdate(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["input"] = arg1
+	args["update"] = arg1
 	return args, nil
 }
 func (ec *executionContext) field_Mutation_updateTodo_argsID(
@@ -210,16 +210,16 @@ func (ec *executionContext) field_Mutation_updateTodo_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateTodo_argsInput(
+func (ec *executionContext) field_Mutation_updateTodo_argsUpdate(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.TodoInput, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNTodoInput2todoᚑtasksᚋgraphᚋmodelᚐTodoInput(ctx, tmp)
+) (model.UpdateTodo, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("update"))
+	if tmp, ok := rawArgs["update"]; ok {
+		return ec.unmarshalNUpdateTodo2todoᚑtasksᚋgraphᚋmodelᚐUpdateTodo(ctx, tmp)
 	}
 
-	var zeroVal model.TodoInput
+	var zeroVal model.UpdateTodo
 	return zeroVal, nil
 }
 
@@ -398,8 +398,30 @@ func (ec *executionContext) _Mutation_updateTodo(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateTodo(rctx, fc.Args["id"].(string), fc.Args["input"].(model.TodoInput))
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateTodo(rctx, fc.Args["id"].(string), fc.Args["update"].(model.UpdateTodo))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.Authenticated == nil {
+				var zeroVal *todos.Todo
+				return zeroVal, errors.New("directive authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*todos.Todo); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *todo-tasks/internal/domain/todos.Todo`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -461,8 +483,30 @@ func (ec *executionContext) _Mutation_deleteTodo(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteTodo(rctx, fc.Args["id"].(string))
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteTodo(rctx, fc.Args["id"].(string))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.Authenticated == nil {
+				var zeroVal *todos.Todo
+				return zeroVal, errors.New("directive authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*todos.Todo); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *todo-tasks/internal/domain/todos.Todo`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1145,6 +1189,40 @@ func (ec *executionContext) unmarshalInputTodoInput(ctx context.Context, obj any
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateTodo(ctx context.Context, obj any) (model.UpdateTodo, error) {
+	var it model.UpdateTodo
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"text", "done"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "text":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Text = data
+		case "done":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("done"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Done = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -1490,6 +1568,11 @@ func (ec *executionContext) marshalNTodosResponse2ᚖtodoᚑtasksᚋgraphᚋmode
 		return graphql.Null
 	}
 	return ec._TodosResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateTodo2todoᚑtasksᚋgraphᚋmodelᚐUpdateTodo(ctx context.Context, v any) (model.UpdateTodo, error) {
+	res, err := ec.unmarshalInputUpdateTodo(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOTodo2ᚖtodoᚑtasksᚋinternalᚋdomainᚋtodosᚐTodo(ctx context.Context, sel ast.SelectionSet, v *todos.Todo) graphql.Marshaler {

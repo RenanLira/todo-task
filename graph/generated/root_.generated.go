@@ -48,7 +48,7 @@ type ComplexityRoot struct {
 		CreateUser func(childComplexity int, username string, email string, password string) int
 		DeleteTodo func(childComplexity int, id string) int
 		LoginUser  func(childComplexity int, email string, password string) int
-		UpdateTodo func(childComplexity int, id string, input model.TodoInput) int
+		UpdateTodo func(childComplexity int, id string, update model.UpdateTodo) int
 	}
 
 	PageInfo struct {
@@ -157,7 +157,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateTodo(childComplexity, args["id"].(string), args["input"].(model.TodoInput)), true
+		return e.complexity.Mutation.UpdateTodo(childComplexity, args["id"].(string), args["update"].(model.UpdateTodo)), true
 
 	case "PageInfo.hasNextPage":
 		if e.complexity.PageInfo.HasNextPage == nil {
@@ -270,6 +270,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputPageInput,
 		ec.unmarshalInputTodoInput,
+		ec.unmarshalInputUpdateTodo,
 	)
 	first := true
 
@@ -387,6 +388,11 @@ type Todo {
   done: Boolean!
 }
 
+input UpdateTodo {
+  text: String
+  done: Boolean
+}
+
 input TodoInput {
   text: String!
 }
@@ -403,8 +409,8 @@ type Query {
 
 type Mutation {
   createTodo(input: TodoInput!): Todo! @authenticated
-  updateTodo(id: ID!, input: TodoInput!): Todo!
-  deleteTodo(id: ID!): Todo!
+  updateTodo(id: ID!, update: UpdateTodo!): Todo! @authenticated
+  deleteTodo(id: ID!): Todo! @authenticated
 }
 `, BuiltIn: false},
 	{Name: "../schemas/user.graphqls", Input: `type User {

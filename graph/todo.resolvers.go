@@ -17,7 +17,6 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.TodoInput) (*todos.Todo, error) {
-
 	user := ctx.Value(decorators.UserCtxKey).(*users.User)
 
 	todo, err := r.TodoService.CreateTodo(todos.CreateTodoDTO{
@@ -32,13 +31,27 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.TodoInput
 }
 
 // UpdateTodo is the resolver for the updateTodo field.
-func (r *mutationResolver) UpdateTodo(ctx context.Context, id string, input model.TodoInput) (*todos.Todo, error) {
-	panic(fmt.Errorf("not implemented: UpdateTodo - updateTodo"))
+func (r *mutationResolver) UpdateTodo(ctx context.Context, id string, update model.UpdateTodo) (*todos.Todo, error) {
+	user := ctx.Value(decorators.UserCtxKey).(*users.User)
+
+	todo, err := r.TodoService.UpdateTodo(todos.Todo{
+		ID:     id,
+		Text:   *update.Text,
+		UserID: user.ID,
+		Done:   *update.Done,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return todo, nil
+
 }
 
 // DeleteTodo is the resolver for the deleteTodo field.
 func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (*todos.Todo, error) {
-	panic(fmt.Errorf("not implemented: DeleteTodo - deleteTodo"))
+	return nil, fmt.Errorf("not implemented: DeleteTodo - deleteTodo")
+
 }
 
 // Todos is the resolver for the todos field.
