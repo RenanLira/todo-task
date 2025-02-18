@@ -39,13 +39,15 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Authenticated func(ctx context.Context, obj any, next graphql.Resolver) (res any, err error)
 }
 
 type ComplexityRoot struct {
 	Mutation struct {
 		CreateTodo func(childComplexity int, input model.TodoInput) int
-		CreateUser func(childComplexity int, username string, email string) int
+		CreateUser func(childComplexity int, username string, email string, password string) int
 		DeleteTodo func(childComplexity int, id string) int
+		LoginUser  func(childComplexity int, email string, password string) int
 		UpdateTodo func(childComplexity int, id string, input model.TodoInput) int
 	}
 
@@ -119,7 +121,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateUser(childComplexity, args["username"].(string), args["email"].(string)), true
+		return e.complexity.Mutation.CreateUser(childComplexity, args["username"].(string), args["email"].(string), args["password"].(string)), true
 
 	case "Mutation.deleteTodo":
 		if e.complexity.Mutation.DeleteTodo == nil {
@@ -132,6 +134,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteTodo(childComplexity, args["id"].(string)), true
+
+	case "Mutation.loginUser":
+		if e.complexity.Mutation.LoginUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_loginUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.LoginUser(childComplexity, args["email"].(string), args["password"].(string)), true
 
 	case "Mutation.updateTodo":
 		if e.complexity.Mutation.UpdateTodo == nil {
@@ -365,7 +379,9 @@ type PageInfo {
   quantity: Int!
 }
 `, BuiltIn: false},
-	{Name: "../schemas/todo.graphqls", Input: `type Todo {
+	{Name: "../schemas/todo.graphqls", Input: `directive @authenticated on OBJECT | FIELD_DEFINITION
+
+type Todo {
   id: ID!
   text: String!
   done: Boolean!
@@ -386,7 +402,7 @@ type Query {
 }
 
 type Mutation {
-  createTodo(input: TodoInput!): Todo!
+  createTodo(input: TodoInput!): Todo! @authenticated
   updateTodo(id: ID!, input: TodoInput!): Todo!
   deleteTodo(id: ID!): Todo!
 }
@@ -399,7 +415,8 @@ type Mutation {
 
 
 extend type Mutation {
-    createUser(username: String!, email: String!): User!
+    createUser(username: String!, email: String!, password: String!): User!
+    loginUser(email: String!, password: String!): String!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

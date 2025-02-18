@@ -4,7 +4,10 @@ import (
 	"net/http"
 	"todo-tasks/graph"
 
+	"todo-tasks/graph/directives"
 	"todo-tasks/graph/generated"
+	"todo-tasks/internal/domain/auth/middlewares"
+	auth_service "todo-tasks/internal/domain/auth/services"
 	todo_service "todo-tasks/internal/domain/todos/services"
 	user_service "todo-tasks/internal/domain/users/services"
 
@@ -26,10 +29,16 @@ func init() {
 }
 
 func graphQLHandler() http.Handler {
-	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
+
+	c := generated.Config{Resolvers: &graph.Resolver{
 		TodoService:  todo_service.NewTodoService(),
 		UserResolver: user_service.NewUserService(),
-	}}))
+		AuthResolver: auth_service.NewAuthService(),
+	}}
+
+	c.Directives.Authenticated = directives.AuthDirective
+
+	srv := handler.New(generated.NewExecutableSchema(c))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
@@ -55,7 +64,7 @@ func main() {
 	})
 
 	r.Route("/query", func(r chi.Router) {
-
+		r.Use(middlewares.AuthMiddleware())
 		r.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 		r.Handle("/", graphQLHandler())
 	})

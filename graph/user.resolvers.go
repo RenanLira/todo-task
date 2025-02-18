@@ -12,13 +12,23 @@ import (
 )
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, username string, email string) (*users.User, error) {
-	user, err := r.UserResolver.CreateUser(username, email)
+func (r *mutationResolver) CreateUser(ctx context.Context, username string, email string, password string) (*users.User, error) {
+	user, err := r.UserResolver.CreateUser(username, email, password)
 	if err != nil {
 		return nil, err
 	}
 
 	return user, nil
+}
+
+// LoginUser is the resolver for the loginUser field.
+func (r *mutationResolver) LoginUser(ctx context.Context, email string, password string) (string, error) {
+	_, token, err := r.AuthResolver.Login(email, password)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 // Name is the resolver for the name field.

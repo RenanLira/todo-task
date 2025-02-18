@@ -1,6 +1,7 @@
 package graph
 
 import (
+	auth_service "todo-tasks/internal/domain/auth/services"
 	todo_service "todo-tasks/internal/domain/todos/services"
 	user_service "todo-tasks/internal/domain/users/services"
 )
@@ -12,4 +13,5 @@ import (
 type Resolver struct {
 	TodoService  *todo_service.TodoService
 	UserResolver *user_service.UserService
+	AuthResolver *auth_service.AuthService
 }

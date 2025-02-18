@@ -5,22 +5,31 @@ import (
 	"todo-tasks/internal/internalerrors"
 
 	"github.com/rs/xid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID       string       `gorm:"primaryKey"`
-	Username string       `gorm:"unique"`
-	Email    string       `gorm:"unique" validate:"email"`
-	Todos    []todos.Todo `gorm:"foreignKey:UserID"`
+	ID           string       `gorm:"primaryKey"`
+	Username     string       `gorm:"unique"`
+	Email        string       `gorm:"unique" validate:"email"`
+	Password     string       `validate:"min=8,max=64" gorm:"-" json:"-" graphql:"-"`
+	HashPassword string       `gorm:"not null" json:"-" graphql:"-"`
+	Todos        []todos.Todo `gorm:"foreignKey:UserID"`
 }
 
-func NewUser(username string, email string) (*User, error) {
+func (u *User) ComparePassword(password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(u.HashPassword), []byte(password))
+}
+
+
+func NewUser(username string, email string, password string) (*User, error) {
 	id := xid.New().String()
 
 	user := &User{
 		ID:       id,
 		Username: username,
 		Email:    email,
+		Password: password,
 		Todos:    []todos.Todo{},
 	}
 
@@ -29,5 +38,22 @@ func NewUser(username string, email string) (*User, error) {
 		return nil, err
 	}
 
+	err = addHashPassword(user)
+	if err != nil {
+		return nil, err
+	}
+
 	return user, nil
+}
+
+func addHashPassword(user *User) error {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	if err != nil {
+		return err
+	}
+
+	user.HashPassword = string(bytes)
+	user.Password = ""
+
+	return nil
 }

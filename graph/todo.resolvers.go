@@ -9,22 +9,20 @@ import (
 	"fmt"
 	"todo-tasks/graph/generated"
 	"todo-tasks/graph/model"
+	"todo-tasks/internal/domain/auth/decorators"
 	"todo-tasks/internal/domain/todos"
+	"todo-tasks/internal/domain/users"
 	"todo-tasks/internal/utils"
 )
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.TodoInput) (*todos.Todo, error) {
 
-
-	userID := ctx.Value("user_id")
-	if userID == nil {
-		return nil, fmt.Errorf("user not found")
-	}
+	user := ctx.Value(decorators.UserCtxKey).(*users.User)
 
 	todo, err := r.TodoService.CreateTodo(todos.CreateTodoDTO{
 		Text:   input.Text,
-		UserID: userID.(string),
+		UserID: user.ID,
 	})
 	if err != nil {
 		return nil, err
