@@ -55,21 +55,21 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (*todos.To
 }
 
 // Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error) {
+func (r *queryResolver) Todos(_ context.Context, page *model.PageInput) (*model.TodosResponse, error) {
 	var dto todos.ReqGetAllTodosDTO
 	utils.CopyStruct(&dto, *page)
 
-	todos, err := r.TodoService.GetAllTodos(dto)
+	todosList, err := r.TodoService.GetAllTodos(dto)
 	if err != nil {
 		return nil, err
 	}
 
 	return &model.TodosResponse{
-		Todos: todos.Todos,
+		Todos: todosList.Todos,
 		PageInfo: &model.PageInfo{
-			HasNextPage:     todos.Page.HasNextPage,
-			HasPreviousPage: todos.Page.HasPreviousPage,
-			Quantity:        int32(todos.Page.Quantity),
+			HasNextPage:     todosList.Page.HasNextPage,
+			HasPreviousPage: todosList.Page.HasPreviousPage,
+			Quantity:        int32(todosList.Page.Quantity),
 		},
 	}, nil
 }
