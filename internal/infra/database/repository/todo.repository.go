@@ -31,9 +31,10 @@ func (r *TodoRepositoryImp) Delete(todo *todos.Todo) error {
 }
 
 func (r *TodoRepositoryImp) Find(id string) (*todos.Todo, error) {
-	var todo todos.Todo
-	err := r.db.First(&todo, id).Error
-	return &todo, err
+	var todo *todos.Todo
+	err := r.db.First(&todo, "id", id).Error
+
+	return todo, err
 }
 
 func (r *TodoRepositoryImp) GetAll(limit int32, offset int32) ([]*todos.Todo, error) {

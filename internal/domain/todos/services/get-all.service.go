@@ -5,27 +5,25 @@ import (
 	"todo-tasks/internal/utils/types"
 )
 
-
-
 type GetAllTodosResponseDTO struct {
 	Todos []*todos.Todo `json:"todos"`
-	Page  types.Page          `json:"pageInfo"`
+	Page  types.Page    `json:"pageInfo"`
 }
 
-func (s *TodoService) GetAllTodos(dto todos.ReqGetAllTodosDTO) (*GetAllTodosResponseDTO, error) {
+func (t *TodoService) GetAllTodos(dto todos.ReqGetAllTodosDTO) (*GetAllTodosResponseDTO, error) {
 
-	todos, err := s.TodoRepository.GetAll(dto.Limit, dto.Page*dto.Limit)
+	all, err := t.TodoRepository.GetAll(dto.Limit, dto.Page*dto.Limit)
 	if err != nil {
 		return nil, err
 	}
 
-	pageInfo, err := s.TodoRepository.GetPageInfo(int(dto.Limit), int(dto.Page))
+	pageInfo, err := t.TodoRepository.GetPageInfo(int(dto.Limit), int(dto.Page))
 	if err != nil {
 		return nil, err
 	}
 
 	return &GetAllTodosResponseDTO{
-		Todos: todos,
+		Todos: all,
 		Page:  pageInfo,
 	}, nil
 }

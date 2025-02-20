@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"todo-tasks/internal/domain/auth/authorization"
 	"todo-tasks/internal/domain/auth/types"
 	"todo-tasks/internal/domain/users"
 	"todo-tasks/internal/utils"
@@ -25,9 +26,21 @@ func validateToken(tokenString string) (*users.User, error) {
 		return nil, err
 	}
 
-	claims, _ := token.Claims.(types.JwtClaims)
+	claims := token.Claims.(jwt.MapClaims)
+	var user users.User
 
-	return &claims.User, nil
+	err = utils.MapToStruct(claims["user"].(map[string]any), &user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func setEnforcerGroupPolicy(user *users.User) error {
+	e := authorization.GetEnforcer()
+	_, err := e.AddGroupingPolicy(user.ID, "user")
+	return err
 }
 
 func AuthMiddleware() func(next http.Handler) http.Handler {
@@ -56,7 +69,12 @@ func AuthMiddleware() func(next http.Handler) http.Handler {
 				return
 			}
 
-			// Do something
+			err = setEnforcerGroupPolicy(user)
+			if err != nil {
+				utils.SendJSON(w, map[string]string{"error": "Failed to add grouping policy", "message": err.Error()}, http.StatusInternalServerError)
+				return
+			}
+
 			ctx := context.WithValue(r.Context(), types.UserCtxKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

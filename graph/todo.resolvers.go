@@ -33,7 +33,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.TodoInput
 // UpdateTodo is the resolver for the updateTodo field.
 func (r *mutationResolver) UpdateTodo(ctx context.Context, id string, update model.UpdateTodo) (*todos.Todo, error) {
 	user := ctx.Value(types.UserCtxKey).(*users.User)
-
+	fmt.Println(user)
 	todo, err := r.TodoService.UpdateTodo(todos.Todo{
 		ID:     id,
 		Text:   *update.Text,
@@ -45,17 +45,22 @@ func (r *mutationResolver) UpdateTodo(ctx context.Context, id string, update mod
 	}
 
 	return todo, nil
-
 }
 
 // DeleteTodo is the resolver for the deleteTodo field.
 func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (*todos.Todo, error) {
-	return nil, fmt.Errorf("not implemented: DeleteTodo - deleteTodo")
+	user := ctx.Value(types.UserCtxKey).(*users.User)
 
+	todo, err := r.TodoService.DeleteTodo(id, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return todo, nil
 }
 
 // Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(_ context.Context, page *model.PageInput) (*model.TodosResponse, error) {
+func (r *queryResolver) Todos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error) {
 	var dto todos.ReqGetAllTodosDTO
 	utils.CopyStruct(&dto, *page)
 
@@ -72,6 +77,11 @@ func (r *queryResolver) Todos(_ context.Context, page *model.PageInput) (*model.
 			Quantity:        int32(todosList.Page.Quantity),
 		},
 	}, nil
+}
+
+// MyTodos is the resolver for the myTodos field.
+func (r *queryResolver) MyTodos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error) {
+	panic(fmt.Errorf("not implemented: MyTodos - myTodos"))
 }
 
 // TodoByID is the resolver for the todoById field.

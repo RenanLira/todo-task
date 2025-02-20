@@ -58,6 +58,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		MyTodos  func(childComplexity int, page *model.PageInput) int
 		TodoByID func(childComplexity int, id string) int
 		Todos    func(childComplexity int, page *model.PageInput) int
 	}
@@ -180,6 +181,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PageInfo.Quantity(childComplexity), true
 
+	case "Query.myTodos":
+		if e.complexity.Query.MyTodos == nil {
+			break
+		}
+
+		args, err := ec.field_Query_myTodos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MyTodos(childComplexity, args["page"].(*model.PageInput)), true
+
 	case "Query.todoById":
 		if e.complexity.Query.TodoByID == nil {
 			break
@@ -282,7 +295,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, opCtx.Operation.SelectionSet)
+				data = ec._queryMiddleware(ctx, opCtx.Operation, func(ctx context.Context) (any, error) {
+					return ec._Query(ctx, opCtx.Operation.SelectionSet), nil
+				})
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -380,7 +395,7 @@ type PageInfo {
   quantity: Int!
 }
 `, BuiltIn: false},
-	{Name: "../schemas/todo.graphqls", Input: `directive @authenticated on OBJECT | FIELD_DEFINITION
+	{Name: "../schemas/todo.graphqls", Input: `directive @authenticated on OBJECT | FIELD_DEFINITION | QUERY
 
 type Todo {
   id: ID!
@@ -403,8 +418,9 @@ type TodosResponse {
 }
 
 type Query {
-  todos(page: PageInput): TodosResponse!
-  todoById(id: ID!): Todo
+  todos(page: PageInput): TodosResponse! @authenticated
+  myTodos(page: PageInput): TodosResponse! @authenticated
+  todoById(id: ID!): Todo @authenticated
 }
 
 type Mutation {

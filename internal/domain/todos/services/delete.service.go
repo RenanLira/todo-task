@@ -1,17 +1,26 @@
 package services
 
-import "errors"
+import (
+	"errors"
+	"todo-tasks/internal/domain/auth/authorization"
+	"todo-tasks/internal/domain/todos"
+)
 
-func (t *TodoService) DeleteTodo(id string) error {
+func (t *TodoService) DeleteTodo(id string, userId string) (*todos.Todo, error) {
 	todo, _ := t.TodoRepository.Find(id)
 	if todo == nil {
-		return errors.New("todo not found")
+		return nil, errors.New("todo not found")
 	}
 
-	err := t.TodoRepository.Delete(todo)
+	err := authorization.UserTodoAllow(userId, "delete", todo.UserID)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	
-	return nil
+
+	err = t.TodoRepository.Delete(todo)
+	if err != nil {
+		return nil, err
+	}
+
+	return todo, nil
 }

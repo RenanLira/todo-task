@@ -4,6 +4,7 @@ go 1.23.2
 
 require (
 	github.com/99designs/gqlgen v0.17.64
+	github.com/casbin/casbin/v2 v2.103.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
@@ -14,6 +15,11 @@ require (
 	golang.org/x/crypto v0.33.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
+)
+
+require (
+	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
+	github.com/casbin/govaluate v1.3.0 // indirect
 )
 
 require (

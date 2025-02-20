@@ -1,4 +1,4 @@
-directive @authenticated on OBJECT | FIELD_DEFINITION
+directive @authenticated on OBJECT | FIELD_DEFINITION | QUERY
 
 type Todo {
   id: ID!
@@ -21,8 +21,9 @@ type TodosResponse {
 }
 
 type Query {
-  todos(page: PageInput): TodosResponse!
-  todoById(id: ID!): Todo
+  todos(page: PageInput): TodosResponse! @authenticated
+  myTodos(page: PageInput): TodosResponse! @authenticated
+  todoById(id: ID!): Todo @authenticated
 }
 
 type Mutation {
