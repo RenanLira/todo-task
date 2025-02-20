@@ -3,22 +3,18 @@ package services
 import (
 	"os"
 	"time"
+	"todo-tasks/internal/domain/auth/types"
 	"todo-tasks/internal/domain/users"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type CustomClaims struct {
-	users.User `json:"user"`
-	jwt.RegisteredClaims
-}
-
 func generateToken(user *users.User) (string, error) {
-	claims := &CustomClaims{
-		*user,
-		jwt.RegisteredClaims{
+	claims := &types.JwtClaims{
+		User: *user,
+		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
-			ID: user.ID,
+			ID:        user.ID,
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

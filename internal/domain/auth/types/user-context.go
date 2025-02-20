@@ -1,4 +1,4 @@
-package decorators
+package types
 
 type ContextKey string
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"todo-tasks/internal/domain/auth/decorators"
+	"todo-tasks/internal/domain/auth/types"
 	"todo-tasks/internal/domain/users"
 	"todo-tasks/internal/utils"
 
@@ -25,16 +25,9 @@ func validateToken(tokenString string) (*users.User, error) {
 		return nil, err
 	}
 
-	claims, _ := token.Claims.(jwt.MapClaims)
+	claims, _ := token.Claims.(types.JwtClaims)
 
-	var user users.User
-
-	err = utils.MapToStruct(claims["user"].(map[string]any), &user)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
+	return &claims.User, nil
 }
 
 func AuthMiddleware() func(next http.Handler) http.Handler {
@@ -64,7 +57,7 @@ func AuthMiddleware() func(next http.Handler) http.Handler {
 			}
 
 			// Do something
-			ctx := context.WithValue(r.Context(), decorators.UserCtxKey, user)
+			ctx := context.WithValue(r.Context(), types.UserCtxKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

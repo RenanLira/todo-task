@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"todo-tasks/graph/generated"
 	"todo-tasks/graph/model"
-	"todo-tasks/internal/domain/auth/decorators"
+	"todo-tasks/internal/domain/auth/types"
 	"todo-tasks/internal/domain/todos"
 	"todo-tasks/internal/domain/users"
 	"todo-tasks/internal/utils"
@@ -17,7 +17,7 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.TodoInput) (*todos.Todo, error) {
-	user := ctx.Value(decorators.UserCtxKey).(*users.User)
+	user := ctx.Value(types.UserCtxKey).(*users.User)
 
 	todo, err := r.TodoService.CreateTodo(todos.CreateTodoDTO{
 		Text:   input.Text,
@@ -32,7 +32,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.TodoInput
 
 // UpdateTodo is the resolver for the updateTodo field.
 func (r *mutationResolver) UpdateTodo(ctx context.Context, id string, update model.UpdateTodo) (*todos.Todo, error) {
-	user := ctx.Value(decorators.UserCtxKey).(*users.User)
+	user := ctx.Value(types.UserCtxKey).(*users.User)
 
 	todo, err := r.TodoService.UpdateTodo(todos.Todo{
 		ID:     id,
