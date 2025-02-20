@@ -9,7 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func AuthDirective(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
+func AuthDirective(ctx context.Context, _ any, next graphql.Resolver) (any, error) {
 
 	user := ctx.Value(types.UserCtxKey)
 
