@@ -4,12 +4,6 @@ import (
 	"reflect"
 )
 
-func UpdateIfNotNull[T any](target *T, value *T) {
-	if value != nil {
-		*target = *value
-	}
-}
-
 func CopyStruct[T interface{}](target *T, value interface{}) {
 	valueValue := reflect.ValueOf(value)
 	valueType := reflect.TypeOf(value)
