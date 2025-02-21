@@ -4,9 +4,10 @@ import (
 	"errors"
 	"todo-tasks/internal/domain/auth/authorization"
 	"todo-tasks/internal/domain/todos"
+	"todo-tasks/internal/utils"
 )
 
-func (t *TodoService) UpdateTodo(todoDTO todos.Todo) (*todos.Todo, error) {
+func (t *TodoService) UpdateTodo(todoDTO todos.ReqUpdateTodoDTO) (*todos.Todo, error) {
 	todo, err := t.TodoRepository.Find(todoDTO.ID)
 	if err != nil {
 		return nil, errors.New("todo not found")
@@ -17,15 +18,12 @@ func (t *TodoService) UpdateTodo(todoDTO todos.Todo) (*todos.Todo, error) {
 		return nil, err
 	}
 
-	err = t.TodoRepository.Update(&todos.Todo{
-		ID:     todo.ID,
-		Done:   todoDTO.Done,
-		Text:   todoDTO.Text,
-		UserID: todo.UserID,
-	})
+	utils.CopyStruct(todo, todoDTO.Fields)
+
+	err = t.TodoRepository.Update(todo)
 	if err != nil {
 		return nil, err
 	}
 
-	return &todoDTO, nil
+	return todo, nil
 }

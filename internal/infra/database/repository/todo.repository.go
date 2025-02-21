@@ -14,38 +14,38 @@ type TodoRepository interface {
 	GetPageInfo(perPage int, page int) (types.Page, error)
 }
 
-type TodoRepositoryImp struct {
+type TodoRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func (r *TodoRepositoryImp) Create(todo *todos.Todo) error {
+func (r *TodoRepositoryImpl) Create(todo *todos.Todo) error {
 	return r.db.Create(todo).Error
 }
 
-func (r *TodoRepositoryImp) Update(todo *todos.Todo) error {
+func (r *TodoRepositoryImpl) Update(todo *todos.Todo) error {
 	return r.db.Save(todo).Error
 }
 
-func (r *TodoRepositoryImp) Delete(todo *todos.Todo) error {
+func (r *TodoRepositoryImpl) Delete(todo *todos.Todo) error {
 	return r.db.Delete(todo).Error
 }
 
-func (r *TodoRepositoryImp) Find(id string) (*todos.Todo, error) {
+func (r *TodoRepositoryImpl) Find(id string) (*todos.Todo, error) {
 	var todo *todos.Todo
 	err := r.db.First(&todo, "id", id).Error
 
 	return todo, err
 }
 
-func (r *TodoRepositoryImp) GetAll(limit int32, offset int32) ([]*todos.Todo, error) {
+func (r *TodoRepositoryImpl) GetAll(limit int32, offset int32) ([]*todos.Todo, error) {
 
-	var todos []*todos.Todo
-	err := r.db.Find(&todos).Limit(int(limit)).Offset(int(offset)).Error
+	var t []*todos.Todo
+	err := r.db.Find(&t).Limit(int(limit)).Offset(int(offset)).Error
 
-	return todos, err
+	return t, err
 }
 
-func (r *TodoRepositoryImp) GetPageInfo(perPage int, page int) (types.Page, error) {
+func (r *TodoRepositoryImpl) GetPageInfo(perPage int, page int) (types.Page, error) {
 
 	var count int64
 	r.db.Model(&todos.Todo{}).Count(&count)
@@ -57,6 +57,6 @@ func (r *TodoRepositoryImp) GetPageInfo(perPage int, page int) (types.Page, erro
 	}, nil
 }
 
-func NewTodoRepository() *TodoRepositoryImp {
-	return &TodoRepositoryImp{db: database.NewDB()}
+func NewTodoRepository() *TodoRepositoryImpl {
+	return &TodoRepositoryImpl{db: database.NewDB()}
 }
