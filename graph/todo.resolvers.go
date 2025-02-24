@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"todo-tasks/graph/generated"
 	"todo-tasks/graph/model"
 	"todo-tasks/internal/domain/auth/types"
@@ -62,34 +61,38 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (*todos.To
 	return todo, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error) {
-	var dto todos.ReqGetAllTodosDTO
-	utils.CopyStruct(&dto, *page)
+// MyTodos is the resolver for the myTodos field.
+func (r *queryResolver) MyTodos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error) {
+	user := ctx.Value(types.UserCtxKey).(*users.User)
 
-	todosList, err := r.TodoService.GetAllTodos(dto)
+	var req todos.ReqGetAllTodosDTO
+	utils.CopyStruct(&req, *page)
+
+	res, err := r.TodoService.GetAllTodos(req, user.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &model.TodosResponse{
-		Todos: todosList.Todos,
+		Todos: res.Todos,
 		PageInfo: &model.PageInfo{
-			HasNextPage:     todosList.Page.HasNextPage,
-			HasPreviousPage: todosList.Page.HasPreviousPage,
-			Quantity:        int32(todosList.Page.Quantity),
+			HasNextPage:     res.Page.HasNextPage,
+			HasPreviousPage: res.Page.HasPreviousPage,
+			Quantity:        int32(res.Page.Quantity),
 		},
 	}, nil
 }
 
-// MyTodos is the resolver for the myTodos field.
-func (r *queryResolver) MyTodos(ctx context.Context, page *model.PageInput) (*model.TodosResponse, error) {
-	panic(fmt.Errorf("not implemented: MyTodos - myTodos"))
-}
-
 // TodoByID is the resolver for the todoById field.
 func (r *queryResolver) TodoByID(ctx context.Context, id string) (*todos.Todo, error) {
-	panic(fmt.Errorf("not implemented: TodoByID - todoById"))
+	user := ctx.Value(types.UserCtxKey).(*users.User)
+
+	todo, err := r.TodoService.Find(id, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return todo, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -100,3 +103,15 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *queryResolver) Todos(_ context.Context, _ *model.PageInput) (*model.TodosResponse, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+*/

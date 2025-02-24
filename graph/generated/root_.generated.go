@@ -60,7 +60,6 @@ type ComplexityRoot struct {
 	Query struct {
 		MyTodos  func(childComplexity int, page *model.PageInput) int
 		TodoByID func(childComplexity int, id string) int
-		Todos    func(childComplexity int, page *model.PageInput) int
 	}
 
 	Todo struct {
@@ -204,18 +203,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.TodoByID(childComplexity, args["id"].(string)), true
-
-	case "Query.todos":
-		if e.complexity.Query.Todos == nil {
-			break
-		}
-
-		args, err := ec.field_Query_todos_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Todos(childComplexity, args["page"].(*model.PageInput)), true
 
 	case "Todo.done":
 		if e.complexity.Todo.Done == nil {
@@ -418,7 +405,6 @@ type TodosResponse {
 }
 
 type Query {
-  todos(page: PageInput): TodosResponse! @authenticated
   myTodos(page: PageInput): TodosResponse! @authenticated
   todoById(id: ID!): Todo @authenticated
 }

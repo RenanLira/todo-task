@@ -10,9 +10,9 @@ type GetAllTodosResponseDTO struct {
 	Page  types.Page    `json:"pageInfo"`
 }
 
-func (t *TodoService) GetAllTodos(dto todos.ReqGetAllTodosDTO) (*GetAllTodosResponseDTO, error) {
+func (t *TodoService) GetAllTodos(dto todos.ReqGetAllTodosDTO, userId string) (*GetAllTodosResponseDTO, error) {
 
-	all, err := t.TodoRepository.GetAll(dto.Limit, dto.Page*dto.Limit)
+	all, err := t.TodoRepository.GetAllByUser(userId, dto.Limit, dto.Page*dto.Limit)
 	if err != nil {
 		return nil, err
 	}

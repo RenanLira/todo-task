@@ -12,6 +12,7 @@ type TodoRepository interface {
 	database.Repository[todos.Todo]
 	GetAll(limit int32, offset int32) ([]*todos.Todo, error)
 	GetPageInfo(perPage int, page int) (types.Page, error)
+	GetAllByUser(userId string, limit int32, offset int32) ([]*todos.Todo, error)
 }
 
 type TodoRepositoryImpl struct {
@@ -55,6 +56,17 @@ func (r *TodoRepositoryImpl) GetPageInfo(perPage int, page int) (types.Page, err
 		HasPreviousPage: page > 1,
 		Quantity:        int(count),
 	}, nil
+}
+
+func (r *TodoRepositoryImpl) GetAllByUser(userId string, limit int32, offset int32) ([]*todos.Todo, error) {
+	var todosList []*todos.Todo
+
+	err := r.db.Find(&todosList).Where(&todos.Todo{UserID: userId}).Limit(int(limit)).Offset(int(offset)).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return todosList, nil
 }
 
 func NewTodoRepository() *TodoRepositoryImpl {

@@ -1,3 +1,4 @@
 p, user, todo, update, owner
 p, user, todo, delete, owner
+p, user, todo, get, owner
 p, user, todo, all, *

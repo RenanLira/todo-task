@@ -21,7 +21,6 @@ type TodosResponse {
 }
 
 type Query {
-  todos(page: PageInput): TodosResponse! @authenticated
   myTodos(page: PageInput): TodosResponse! @authenticated
   todoById(id: ID!): Todo @authenticated
 }

@@ -1,14 +1,23 @@
 package services
 
-import "todo-tasks/internal/domain/todos"
+import (
+	"fmt"
+	"todo-tasks/internal/domain/auth/authorization"
+	"todo-tasks/internal/domain/todos"
+)
 
-func (t *TodoService) Find(id string) *todos.Todo {
+func (t *TodoService) Find(todoId, userId string) (*todos.Todo, error) {
 
-	todo, err := t.TodoRepository.Find(id)
+	todo, err := t.TodoRepository.Find(todoId)
 	if err != nil || todo == nil {
-		return nil
+		return nil, fmt.Errorf("not found")
 	}
 
-	return todo
+	err = authorization.UserTodoAllow(userId, "get", todo.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return todo, nil
 
 }
