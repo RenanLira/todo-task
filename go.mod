@@ -11,6 +11,7 @@ require (
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/xid v1.6.0
+	github.com/stretchr/testify v1.10.0
 	github.com/vektah/gqlparser/v2 v2.5.22
 	golang.org/x/crypto v0.33.0
 	gorm.io/driver/postgres v1.5.11
@@ -20,6 +21,8 @@ require (
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
 	github.com/casbin/govaluate v1.3.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 )
 
 require (

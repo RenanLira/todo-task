@@ -10,7 +10,7 @@ import (
 
 type User struct {
 	ID           string       `gorm:"primaryKey"`
-	Username     string       `gorm:"unique"`
+	Username     string       `gorm:"unique" validate:"required,min=2,max=32"`
 	Email        string       `gorm:"unique" validate:"email"`
 	Password     string       `validate:"min=8,max=64" gorm:"-" json:"-" graphql:"-"`
 	HashPassword string       `gorm:"not null" json:"-" graphql:"-"`
@@ -20,7 +20,6 @@ type User struct {
 func (u *User) ComparePassword(password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(u.HashPassword), []byte(password))
 }
-
 
 func NewUser(username string, email string, password string) (*User, error) {
 	id := xid.New().String()
