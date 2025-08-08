@@ -13,7 +13,11 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, username string, email string, password string) (*users.User, error) {
-	user, err := r.UserResolver.CreateUser(username, email, password)
+	user, err := r.UserResolver.CreateUser(users.CreateUserDTO{
+		Username: username,
+		Email:    email,
+		Password: password,
+	})
 	if err != nil {
 		return nil, err
 	}

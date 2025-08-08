@@ -2,8 +2,8 @@ package services
 
 import "todo-tasks/internal/domain/users"
 
-func (u *UserService) CreateUser(username string, email string, password string) (*users.User, error) {
-	user, err := users.NewUser(username, email, password)
+func (u *UserService) CreateUser(dto users.CreateUserDTO) (*users.User, error) {
+	user, err := users.NewUser(dto.Username, dto.Email, dto.Password)
 	if err != nil {
 		return nil, err
 	}
