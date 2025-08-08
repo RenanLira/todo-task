@@ -12,15 +12,15 @@ import (
 var (
 	pt                               = pt_BR.New()
 	uni      *ut.UniversalTranslator = ut.New(pt, pt)
-	validate *validator.Validate     = validator.New()
+	Validate *validator.Validate     = validator.New()
 )
 
 func ValidateStruct(s any) error {
 	trans, _ := uni.GetTranslator("pt_BR")
 
-	pt_translations.RegisterDefaultTranslations(validate, trans)
+	pt_translations.RegisterDefaultTranslations(Validate, trans)
 
-	err := validate.Struct(s)
+	err := Validate.Struct(s)
 
 	if err != nil {
 		errs := err.(validator.ValidationErrors)

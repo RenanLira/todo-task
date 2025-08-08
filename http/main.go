@@ -10,6 +10,8 @@ import (
 	auth_service "todo-tasks/internal/domain/auth/services"
 	todo_service "todo-tasks/internal/domain/todos/services"
 	user_service "todo-tasks/internal/domain/users/services"
+	"todo-tasks/internal/internalerrors"
+	customvalidators "todo-tasks/internal/internalerrors/custom-validators"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -26,6 +28,10 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func init() {
+	internalerrors.Validate.RegisterValidation("is_unique_field", customvalidators.IsUniqueField)
 }
 
 func graphQLHandler() http.Handler {
