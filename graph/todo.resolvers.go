@@ -66,6 +66,9 @@ func (r *queryResolver) MyTodos(ctx context.Context, page *model.PageInput) (*mo
 	user := ctx.Value(types.UserCtxKey).(*users.User)
 
 	var req todos.ReqGetAllTodosDTO
+	if page == nil {
+		page = &model.PageInput{}
+	}
 	utils.CopyStruct(&req, *page)
 
 	res, err := r.TodoService.GetAllTodos(req, user.ID)
