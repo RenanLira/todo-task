@@ -10,8 +10,8 @@ import (
 
 type User struct {
 	ID           string       `gorm:"primaryKey"`
-	Username     string       `gorm:"unique" validate:"required,min=2,max=32"`
-	Email        string       `gorm:"unique" validate:"email,is_unique_field"`
+	Username     string       `gorm:"uniqueIndex" validate:"required,min=2,max=32"`
+	Email        string       `gorm:"uniqueIndex" validate:"email,is_unique_field"`
 	Password     string       `validate:"min=8,max=64" gorm:"-" json:"-" graphql:"-"`
 	HashPassword string       `gorm:"not null" json:"-" graphql:"-"`
 	Todos        []todos.Todo `gorm:"foreignKey:UserID"`

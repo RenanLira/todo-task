@@ -12,23 +12,21 @@ type GetAllTodosResponseDTO struct {
 }
 
 func (t *TodoService) GetAllTodos(dto todos.ReqGetAllTodosDTO, userId string) (*GetAllTodosResponseDTO, error) {
-
 	var wg sync.WaitGroup
 
 	var all []*todos.Todo
 	var pageInfo types.Page
 	var err error
 
-	wg.Add(1)
+	wg.Add(2)
 	go func() {
 		defer wg.Done()
 		all, err = t.TodoRepository.GetAllByUser(userId, dto.Limit, dto.Page*dto.Limit)
 	}()
 
-	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		pageInfo, err = t.TodoRepository.GetPageInfo(int(dto.Limit), int(dto.Page))
+		pageInfo, err = t.TodoRepository.GetPageInfo(userId, int(dto.Limit), int(dto.Page))
 	}()
 
 	wg.Wait()

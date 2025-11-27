@@ -39,7 +39,7 @@ func (u *UserRepositoryImpl) Find(id string) (*users.User, error) {
 
 func (u *UserRepositoryImpl) FindByEmail(email string) (*users.User, error) {
 	var user users.User
-	err := u.db.Where("email = ?", email).First(&user).Error
+	err := u.db.Where("email = ?", email).Take(&user).Error
 	if err != nil {
 		return nil, err
 	}

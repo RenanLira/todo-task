@@ -11,7 +11,7 @@ import (
 type TodoRepository interface {
 	database.Repository[todos.Todo]
 	GetAll(limit int32, offset int32) ([]*todos.Todo, error)
-	GetPageInfo(perPage int, page int) (types.Page, error)
+	GetPageInfo(userId string, perPage int, page int) (types.Page, error)
 	GetAllByUser(userId string, limit int32, offset int32) ([]*todos.Todo, error)
 }
 
@@ -46,10 +46,10 @@ func (r *TodoRepositoryImpl) GetAll(limit int32, offset int32) ([]*todos.Todo, e
 	return t, err
 }
 
-func (r *TodoRepositoryImpl) GetPageInfo(perPage int, page int) (types.Page, error) {
+func (r *TodoRepositoryImpl) GetPageInfo(userId string, perPage int, page int) (types.Page, error) {
 
 	var count int64
-	r.db.Model(&todos.Todo{}).Count(&count)
+	r.db.Model(&todos.Todo{}).Where(&todos.Todo{UserID: userId}).Count(&count)
 
 	return types.Page{
 		HasNextPage:     count/int64(perPage) > int64(perPage*page),
@@ -61,7 +61,7 @@ func (r *TodoRepositoryImpl) GetPageInfo(perPage int, page int) (types.Page, err
 func (r *TodoRepositoryImpl) GetAllByUser(userId string, limit int32, offset int32) ([]*todos.Todo, error) {
 	var todosList []*todos.Todo
 
-	err := r.db.Find(&todosList).Where(&todos.Todo{UserID: userId}).Limit(int(limit)).Offset(int(offset)).Error
+	err := r.db.Find(&todosList, &todos.Todo{UserID: userId}).Limit(int(limit)).Offset(int(offset)).Error
 	if err != nil {
 		return nil, err
 	}

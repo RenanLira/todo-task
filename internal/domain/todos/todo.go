@@ -10,7 +10,7 @@ type Todo struct {
 	ID     string `gorm:"primaryKey"`
 	Text   string `gorm:"not null" validate:"required,min=4,max=255"`
 	Done   bool   `gorm:"default:false"`
-	UserID string `gorm:"not null"`
+	UserID string `gorm:"unique;index;not null"`
 }
 
 func NewTodo(text string, userID string) (*Todo, error) {

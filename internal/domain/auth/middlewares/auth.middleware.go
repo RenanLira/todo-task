@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"todo-tasks/internal/domain/auth/authorization"
 	"todo-tasks/internal/domain/auth/types"
 	"todo-tasks/internal/domain/users"
@@ -12,6 +13,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+var mutex = &sync.RWMutex{}
 
 func validateToken(tokenString string) (*users.User, error) {
 
@@ -38,6 +41,9 @@ func validateToken(tokenString string) (*users.User, error) {
 }
 
 func setEnforcerGroupPolicy(user *users.User) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+	
 	e := authorization.GetEnforcer()
 	_, err := e.AddGroupingPolicy(user.ID, "user")
 	return err
