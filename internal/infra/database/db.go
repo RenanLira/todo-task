@@ -37,7 +37,7 @@ func NewDB() *gorm.DB {
 		panic(err)
 	}
 
-	db.AutoMigrate(&todos.Todo{}, &users.User{})
+	db.AutoMigrate(&users.User{}, &todos.Todo{})
 
 	return db
 }
